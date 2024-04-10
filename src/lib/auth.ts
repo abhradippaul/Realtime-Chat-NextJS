@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import { setString } from "./db";
 
 export const authOptions: NextAuthOptions = {
   // session: {
@@ -8,6 +9,9 @@ export const authOptions: NextAuthOptions = {
   // },
   // pages: {
   //   signIn: "/login",
+  // },
+  // pages: {
+  //   error: "/login",
   // },
   providers: [
     Google({
@@ -24,4 +28,19 @@ export const authOptions: NextAuthOptions = {
   //     return token;
   //   },
   // },
+  callbacks: {
+    async signIn({ user }) {
+      const isAllowedToSignIn = true;
+      console.log(user);
+      await setString("email", user.email||"");
+      if (isAllowedToSignIn) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    async redirect({ url, baseUrl }) {
+      return baseUrl;
+    },
+  },
 };

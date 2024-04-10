@@ -7,7 +7,8 @@ const buttonVariants = cva("rounded-md", {
     variant: {
       default: "bg-blue-500 text-white hover:bg-blue-600",
       outline: "border border-2 border-blue-500 hover:bg-blue-500",
-      signin : "bg-gray-900 text-white rounded-md w-full flex items-center justify-center my-2 hover:bg-black"
+      signin : "bg-gray-900 text-white rounded-md w-full flex items-center justify-center my-2 hover:bg-black",
+      add : "bg-gray-900 text-white rounded-md flex items-center justify-center my-2 hover:bg-black"
     },
     size: {
       sm: "py-1 px-2 sm:text-lg",

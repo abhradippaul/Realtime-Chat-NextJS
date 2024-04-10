@@ -2,14 +2,18 @@
 
 import { useCallback, useState } from "react";
 import Button from "../components/ui/Button";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
-import googleLogo from "google.png";
-import githubLogo from "github.png";
+import { useUserContext } from "@/context/UserContextProvider";
+import { useRouter } from "next/navigation";
 
 function page() {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState<boolean>(false);
   const [isLoadingGithub, setIsLoadingGithub] = useState<boolean>(false);
+
+  const {user} = useUserContext()
+  console.log(user);
+
   const signInType = [
     {
       name: "Sign in with Google",
@@ -26,12 +30,12 @@ function page() {
       setLoading: (e: boolean) => setIsLoadingGithub(e),
     },
   ];
+  const router = useRouter()
   const loginFunction = async ({ provider, setLoading }: any) => {
     setLoading(true);
     try {
-      await signIn(provider);
-      // const { data } = useSession();
-      // console.log(data);
+      const response =  await signIn(provider);
+      console.log("Next auth response ",response);
     } catch (err: any) {
       console.log("The error is ", err.message);
       toast.error("The error is ", err.message);
