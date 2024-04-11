@@ -25,18 +25,14 @@ export const useUserContext = () => {
   return useContext(UserContext);
 };
 function UserContextProvider({ children }: { children: React.ReactNode }) {
-  // const [user, setUser] = useState({});
   const { data } = useSession();
   const user = {
     name: data?.user?.name || "",
     email: data?.user?.email || "",
     image: data?.user?.image || "",
   };
-  // console.log("The user is",user);
   return (
-    user && (
-      <User_Context_Provider value={{ user }}>{children}</User_Context_Provider>
-    )
+    <User_Context_Provider value={{ user }}>{children}</User_Context_Provider>
   );
 }
 

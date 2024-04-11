@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Button from "../components/ui/Button";
 import { signIn, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -10,39 +10,41 @@ import { useRouter } from "next/navigation";
 function page() {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState<boolean>(false);
   const [isLoadingGithub, setIsLoadingGithub] = useState<boolean>(false);
+  const [test, setTest] = useState<string>("");
 
-  const {user} = useUserContext()
-  console.log(user);
+  const signInType = useMemo(
+    () => [
+      {
+        name: "Sign in with Google",
+        provider: "google",
+        logo: "google.png",
+        isLoading: isLoadingGoogle,
+        setLoading: (e: boolean) => setIsLoadingGoogle(e),
+      },
+      {
+        name: "Sign in with Github",
+        provider: "github",
+        logo: "github.png",
+        isLoading: isLoadingGithub,
+        setLoading: (e: boolean) => setIsLoadingGithub(e),
+      },
+    ],
+    []
+  );
 
-  const signInType = [
-    {
-      name: "Sign in with Google",
-      provider: "google",
-      logo: "google.png",
-      isLoading: isLoadingGoogle,
-      setLoading: (e: boolean) => setIsLoadingGoogle(e),
-    },
-    {
-      name: "Sign in with Github",
-      provider: "github",
-      logo: "github.png",
-      isLoading: isLoadingGithub,
-      setLoading: (e: boolean) => setIsLoadingGithub(e),
-    },
-  ];
-  const router = useRouter()
-  const loginFunction = async ({ provider, setLoading }: any) => {
+  const router = useRouter();
+  const loginFunction = useCallback(async ({ provider, setLoading }: any) => {
     setLoading(true);
     try {
-      const response =  await signIn(provider);
-      console.log("Next auth response ",response);
+      await signIn(provider)
     } catch (err: any) {
       console.log("The error is ", err.message);
       toast.error("The error is ", err.message);
     } finally {
+      // router.replace("/")
       setLoading(false);
     }
-  };
+  }, []);
 
   return (
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
