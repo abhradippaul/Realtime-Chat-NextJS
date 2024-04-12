@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { setHash } from "./db";
+import { setUserHash } from "./db";
 
 export const authOptions: NextAuthOptions = {
   // session: {
@@ -30,10 +30,8 @@ export const authOptions: NextAuthOptions = {
   // },
   callbacks: {
     async signIn({ user }) {
-      // console.log(user);
-      // await setString("email", user.email||"");
-      await setHash(`user:${user.email}`, "name", user.name || "");
-      await setHash(`user:${user.email}`, "image", user.image || "");
+      await setUserHash(`user:${user.email}`, "name", user.name || "");
+      await setUserHash(`user:${user.email}`, "image", user.image || "");
       if (user.email) {
         return true;
       } else {

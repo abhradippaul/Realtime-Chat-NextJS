@@ -32,7 +32,9 @@ function UserContextProvider({ children }: { children: React.ReactNode }) {
     image: data?.user?.image || "",
   };
   return (
-    <User_Context_Provider value={{ user }}>{children}</User_Context_Provider>
+    <User_Context_Provider value={{ user }}>
+      {children}
+      </User_Context_Provider>
   );
 }
 
