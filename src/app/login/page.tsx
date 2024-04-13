@@ -1,47 +1,40 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import Button from "../components/ui/Button";
 import { signIn, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
-import { useUserContext } from "@/context/UserContextProvider";
-import { useRouter } from "next/navigation";
 
 function page() {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState<boolean>(false);
   const [isLoadingGithub, setIsLoadingGithub] = useState<boolean>(false);
-  const [test, setTest] = useState<string>("");
 
-  const signInType = useMemo(
-    () => [
-      {
-        name: "Sign in with Google",
-        provider: "google",
-        logo: "google.png",
-        isLoading: isLoadingGoogle,
-        setLoading: (e: boolean) => setIsLoadingGoogle(e),
-      },
-      {
-        name: "Sign in with Github",
-        provider: "github",
-        logo: "github.png",
-        isLoading: isLoadingGithub,
-        setLoading: (e: boolean) => setIsLoadingGithub(e),
-      },
-    ],
-    []
-  );
+  const signInType = [
+    {
+      name: "Sign in with Google",
+      provider: "google",
+      logo: "google.png",
+      isLoading: isLoadingGoogle,
+      setLoading: (e: boolean) => setIsLoadingGoogle(e),
+    },
+    {
+      name: "Sign in with Github",
+      provider: "github",
+      logo: "github.png",
+      isLoading: isLoadingGithub,
+      setLoading: (e: boolean) => setIsLoadingGithub(e),
+    },
+  ];
 
-  const router = useRouter();
   const loginFunction = useCallback(async ({ provider, setLoading }: any) => {
     setLoading(true);
+    console.log("test");
     try {
-      await signIn(provider)
+      await signIn(provider);
     } catch (err: any) {
       console.log("The error is ", err.message);
       toast.error("The error is ", err.message);
     } finally {
-      // router.replace("/")
       setLoading(false);
     }
   }, []);

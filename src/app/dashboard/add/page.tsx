@@ -1,12 +1,10 @@
 "use client";
 import Button from "@/app/components/ui/Button";
 import { useUserContext } from "@/context/UserContextProvider";
-import { useRouter } from "next/navigation";
-import { Suspense, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 
 function page() {
-  const [test, setTest] = useState(true);
   const [success, setSuccess] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -43,11 +41,10 @@ function page() {
       setIsLoading(false);
     }
     setInput("");
-    setTest(false)
   }, []);
-  // console.log(success);
+
   return (
-    <main className="min-h-dvh flex items-center justify-center flex-col">
+    <main className="min-h-dvh w-full flex items-center justify-center flex-col">
       <h1 className="text-2xl sm:text-4xl my-8">Add a friend</h1>
       <form
         className="text-xl my-8 sm:text-2xl"
@@ -79,12 +76,10 @@ function page() {
             onChange={(e) => setInput(e.target.value)}
           />
           <Button variant="add" size="default" isLoading={isLoading}>
-            {/* <img src="plus.png" alt="image" /> */}
             Add
           </Button>
         </div>
       </form>
-        {!test && <h1>This is for testing</h1>}
     </main>
   );
 }
