@@ -15,25 +15,24 @@ export default function Home() {
   });
   const data = useSession();
   useEffect(() => {
-    if(data.status === "authenticated") {
-      const {user} = data.data
+    if (data.status === "authenticated") {
+      const { user } = data.data;
       setUserInfo({
         name: user?.name || "",
         email: user?.email || "",
         image: user?.image || "",
-      })
-      setIsLoading(false)
-    } else if(data.status === "loading") {
-
+      });
+      setIsLoading(false);
+    } else if (data.status === "loading") {
     } else {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }, [data]);
   return (
     <div>
       <nav className="flex w-full items-center justify-between bg-slate-50 px-2 h-[7dvh]">
         <h1 className="font-semibold text-xl sm:text-2xl">
-          <Link href="/">Home</Link>
+          <Link href="/">Logo</Link>
         </h1>
         <div className="w-1/2 flex items-center justify-between text-lg sm:text-xl">
           <Link href="/">Home</Link>
@@ -52,13 +51,13 @@ export default function Home() {
               <div className="w-full h-full flex items-center justify-between">
                 <h1 className="mx-2">{userInfo.name.split(" ")[0]}</h1>
                 <img
-                  className="w-12 h-12 object-cover rounded-full"
+                  className="size-10 object-cover rounded-full"
                   src={userInfo.image}
                   alt=""
                 />
                 <img
                   src="logout.png"
-                  className=" m-4 w-10 h-10 object-cover cursor-pointer"
+                  className="m-4 size-8 object-cover cursor-pointer"
                   onClick={async () => {
                     await signOut();
                   }}

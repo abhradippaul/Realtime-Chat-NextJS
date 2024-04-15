@@ -24,10 +24,9 @@ export async function POST(req: NextRequest) {
       );
     }
     const isFriendAdded = await setUserFriend(
-      `user:${userEmail}:friends`,
-      email
+      `user:${email}:pending:friends`,
+      userEmail
     );
-    // console.log(isFriendAdded);
     if (isFriendAdded) {
       return NextResponse.json({
         message: "Already in your friend list",
@@ -35,7 +34,7 @@ export async function POST(req: NextRequest) {
       });
     }
     return NextResponse.json({
-      message: "Friend added successfully",
+      message: "Friend request send successfully",
       success: true,
     });
   } catch (err: any) {
@@ -43,8 +42,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// export const config = {
-//   api: {
-//     bodyParser: true,
-//   },
-// };

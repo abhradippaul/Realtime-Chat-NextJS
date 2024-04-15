@@ -38,13 +38,32 @@ const getUserHash = async (key: string) => {
 
 const setUserFriend = async (key: string, value: string) => {
   // console.log(key,value);
-  const isFriend = await client.SISMEMBER(key,value)
-  if(isFriend) {
-    return true
+  const isFriend = await client.SISMEMBER(key, value);
+  if (isFriend) {
+    return true;
   } else {
-    await client.SADD(key,value)
-    return false
+    await client.SADD(key, value);
+    return false;
   }
 };
 
-export { setUserHash, getUserHash, setUserFriend };
+const getUserPendingRequest = async (Key: string) => {
+  let data = await client.SMEMBERS(Key);
+  let userInfo = []
+  if(data.length) {
+    for(let i = 0; i < data.length; i++) {
+      let user = await client.HGETALL(`user:${data[i]}`);
+      if(user) {
+        userInfo.push({
+          ...user,
+          email: data[i],
+        })
+      }
+    }
+    return userInfo
+  } else {
+    return null
+  }
+};
+
+export { setUserHash, getUserHash, setUserFriend, getUserPendingRequest };
