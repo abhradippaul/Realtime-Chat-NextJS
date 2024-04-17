@@ -1,23 +1,38 @@
-import { getUserHash, getUserPendingRequest } from "@/lib/db";
+import { addUserToFriend, removeUserFromPendingRequest } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
+  const friendEmail = req.nextUrl.searchParams.get("friendEmail");
   const userEmail = req.nextUrl.searchParams.get("userEmail");
-  //   console.log(data);
-  const pendingRequest = await getUserPendingRequest(
-    `user:${userEmail}:pending:friends`
-  );
-  if(!pendingRequest?.length) {
+  if (!userEmail || !friendEmail) {
     return NextResponse.json(
       {
-        message: "No pending request",
+        message: "Please provide userEmail and friendEmail",
       },
       { status: 200 }
     );
   }
-//   console.log(userData);
+  await addUserToFriend(userEmail, friendEmail);
   return NextResponse.json({
-    userInfo : pendingRequest,
+    message: "You have accepted the friend request with "+friendEmail,
+    success: true,
+  });
+}
+
+export async function DELETE(req: NextRequest) {
+  const friendEmail = req.nextUrl.searchParams.get("friendEmail");
+  const userEmail = req.nextUrl.searchParams.get("userEmail");
+  if (!userEmail || !friendEmail) {
+    return NextResponse.json(
+      {
+        message: "Please provide userEmail and friendEmail",
+      },
+      { status: 200 }
+    );
+  }
+  await removeUserFromPendingRequest(userEmail,friendEmail);
+  return NextResponse.json({
+    message: "You have deleted friend request of "+friendEmail,
     success: true,
   });
 }

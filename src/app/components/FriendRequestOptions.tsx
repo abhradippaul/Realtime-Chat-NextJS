@@ -2,9 +2,10 @@
 
 import { useUserContext } from "@/context/UserContextProvider";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-function FriendRequestOptions() {
+function FriendRequestOptions({value} : {value:any}) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [friendRequest, setFriendRequest] = useState([
     {
@@ -15,23 +16,42 @@ function FriendRequestOptions() {
   ]);
   const { user } = useUserContext();
   useEffect(() => {
-    fetch(`/api/friendrequest?userEmail=${user.email}`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          setFriendRequest(data.userInfo);
-          console.log(data.userInfo);
-        }
-      })
-      .catch((err) => {
-        console.log(err.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [user]);
+    if(value.length) {
+      setFriendRequest(value)
+      setIsLoading(false)
+    } else {
+      setFriendRequest([
+        {
+          name: "",
+          email: "",
+          image: "",
+        },
+      ])
+      setIsLoading(false)
+    }
+    // console.log(value);
+  }, [user,value]);
+
+  const acceptFriend = useCallback(async(friendEmail:string) => {
+    const response = await fetch(`/api/friendrequest?userEmail=${user.email}&friendEmail=${friendEmail}`,{
+      method:"POST"
+    })
+    const data = await response.json()
+    if(data.success){
+      toast.success(data.message)
+    }
+  },[user])
+
+  const rejectFriend = useCallback(async(friendEmail:string) => {
+    const response = await fetch(`/api/friendrequest?userEmail=${user.email}&friendEmail=${friendEmail}`,{
+      method:"DELETE"
+    })
+    const data = await response.json()
+    if(data.success){
+      toast.success(data.message)
+    }
+  },[user])
+
   return (
     <>
       <h1 className="text-center my-4 text-2xl font-semibold">
@@ -42,10 +62,10 @@ function FriendRequestOptions() {
         <div className="w-full flex items-center justify-center">
           <Loader2 className="animate-spin size-8" />
         </div>
-      ) : friendRequest.length ? (
+      ) : friendRequest.length && friendRequest[0].email ? (
         friendRequest.map((data) => (
           <div
-            className="w-full mb-4 flex items-center justify-between"
+            className="w-full mb-4 flex items-center hover:bg-indigo-50 cursor-default rounded-lg py-2 justify-between"
             key={data.email}
           >
             <img
@@ -57,19 +77,25 @@ function FriendRequestOptions() {
             <div className="flex">
               <img
                 src="../right.png"
-                className="size-6 mx-1 cursor-pointer rounded-full hover:scale-150"
+                className="size-8 mx-1 cursor-pointer rounded-full hover:scale-125"
                 alt=""
+                onClick={() => {
+                  acceptFriend(data.email)
+                }}
               />
               <img
                 src="../reject.png"
-                className="size-6 mx-1 cursor-pointer hover:scale-150"
+                className="size-8 mx-1 cursor-pointer hover:scale-125"
                 alt=""
+                onClick={() => {
+                  rejectFriend(data.email)
+                }}
               />
             </div>
           </div>
         ))
       ) : (
-        <h1>No Friend Request</h1>
+        <h1 className="text-center text-lg mb-4">No Friend Request</h1>
       )}
     </>
   );

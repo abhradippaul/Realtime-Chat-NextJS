@@ -1,4 +1,4 @@
-import { getUserHash, setUserFriend } from "@/lib/db";
+import { getUserHash, setUserPendingRequest } from "@/lib/db";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,10 +23,11 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     }
-    const isFriendAdded = await setUserFriend(
-      `user:${email}:pending:friends`,
-      userEmail
-    );
+    // const isFriendAdded = await setUserFriend(
+    //   `user:${email}:pending:friends`,
+    //   userEmail
+    // );
+    const isFriendAdded = await setUserPendingRequest({email,userEmail})
     if (isFriendAdded) {
       return NextResponse.json({
         message: "Already in your friend list",
