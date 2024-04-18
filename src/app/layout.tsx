@@ -21,7 +21,6 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <UserContextProvider>
-           
             {children}
           </UserContextProvider>
         </Providers>

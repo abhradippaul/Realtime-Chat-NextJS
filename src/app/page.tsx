@@ -37,7 +37,7 @@ export default function Home() {
         <div className="w-1/2 flex items-center justify-between text-lg sm:text-xl">
           <Link href="/">Home</Link>
           <Link
-            href={`${userInfo.name ? "/dashboard/add" : "/"}`}
+            href={`${userInfo.name ? "/dashboard" : "/"}`}
             className={`${!userInfo.name && "text-gray-500 cursor-text"}`}
           >
             Dashboard

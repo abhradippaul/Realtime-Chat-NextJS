@@ -59,34 +59,35 @@ export async function setUserPendingRequest({
   }
 }
 
-// const getUserPendingRequest = async (Key: string) => {
-//   let data = await client.SMEMBERS(Key);
-//   let userInfo = [];
-//   if (data.length) {
-//     for (let i = 0; i < data.length; i++) {
-//       let user = await client.HGETALL(`user:${data[i]}`);
-//       if (user) {
-//         userInfo.push({
-//           ...user,
-//           email: data[i],
-//         });
-//       }
-//     }
-//     return userInfo;
-//   } else {
-//     return null;
-//   }
-// };
+export async function getUserPendingRequest(userEmail: string) {
+  let pendingFriendRequest = await client.HGETALL(
+    `user:${userEmail}:pending:friend`
+  );
+  const data = Object.keys(pendingFriendRequest);
+  let userInfo = [];
+  if (data.length) {
+    for (let i = 0; i < data.length; i++) {
+      let user = await client.HGETALL(`user:${data[i]}`);
+      if (user) {
+        userInfo.push({
+          ...user,
+          email: data[i],
+        });
+      }
+    }
+    return userInfo;
+  } else {
+    return null;
+  }
+}
 
 export async function getUserDashboard({ userEmail }: { userEmail: string }) {
-  const pendingResponse = await client.HGETALL(
+  const pendingFriendLength = await client.HLEN(
     `user:${userEmail}:pending:friend`
   );
   const friendlist = await client.HGETALL(`user:${userEmail}:friendlist`);
-  const pendingResponseKey = Object.keys(pendingResponse);
   const friendlistKey = Object.keys(friendlist);
   let friendArr = [];
-  let pendingArr = [];
   for (let i = 0; i < friendlistKey.length; i++) {
     const data = await client.HGETALL(`user:${friendlistKey[i]}`);
 
@@ -95,17 +96,9 @@ export async function getUserDashboard({ userEmail }: { userEmail: string }) {
       email: friendlistKey[i],
     });
   }
-  for (let i = 0; i < pendingResponseKey.length; i++) {
-    const data = await client.HGETALL(`user:${pendingResponseKey[i]}`);
-
-    pendingArr.push({
-      ...data,
-      email: pendingResponseKey[i],
-    });
-  }
 
   return {
-    pendingFriend: pendingArr,
+    pendingFriendLength,
     friendlist: friendArr,
   };
 }
@@ -130,8 +123,16 @@ const getUserFriends = async (key: string) => {
 };
 
 const addUserToFriend = async (userEmail: string, friendEmail: string) => {
-  const user = await client.HSET(`user:${userEmail}:friendlist`, friendEmail,"");
-  const friend = await client.HSET(`user:${friendEmail}:friendlist`, userEmail,"");
+  const user = await client.HSET(
+    `user:${userEmail}:friendlist`,
+    friendEmail,
+    ""
+  );
+  const friend = await client.HSET(
+    `user:${friendEmail}:friendlist`,
+    userEmail,
+    ""
+  );
   const isDeletedFromPendingRequest = await client.HDEL(
     `user:${userEmail}:pending:friend`,
     friendEmail
@@ -142,8 +143,15 @@ const addUserToFriend = async (userEmail: string, friendEmail: string) => {
   return true;
 };
 
-export async function removeUserFromPendingRequest (userEmail:string,friendEmail:string) {
+export async function removeUserFromPendingRequest(
+  userEmail: string,
+  friendEmail: string
+) {
   await client.HDEL(`user:${userEmail}:pending:friend`, friendEmail);
+}
+
+export async function getUserPendingRequestLength(userEmail: string) {
+  return await client.HLEN(`user:${userEmail}:pending:friend`);
 }
 
 export { setUserHash, getUserHash, addUserToFriend, getUserFriends };

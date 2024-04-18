@@ -1,4 +1,4 @@
-import { getUserDashboard } from "@/lib/db";
+import { getUserDashboard, getUserPendingRequestLength } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {

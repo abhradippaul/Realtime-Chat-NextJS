@@ -1,8 +1,3 @@
-import Dashboard from "@/app/components/Dashboard";
-import FriendRequestOptions from "@/app/components/FriendRequestOptions";
-import Friends from "@/app/components/Friends";
-import UserInfo from "@/app/components/UserInfo";
-import Link from "next/link";
 import { ReactNode } from "react";
 // import logo from "adduser.png"
 
@@ -16,7 +11,7 @@ const overviewOptions = [
 async function  Layout({ children }: { children: ReactNode }) {
   return (
     <div className="w-full flex items-center justify-between h-screen">
-      <Dashboard />
+      {/* <Dashboard /> */}
       {children}
     </div>
   );
