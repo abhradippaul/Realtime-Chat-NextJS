@@ -15,11 +15,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const isUserExist = await client.HEXISTS(
+    const isUserExist = await client.HGET(
       `user:${userEmail}:friendlist`,
       `${friendEmail}`
     );
-    const isFriendExist = await client.HEXISTS(
+    const isFriendExist = await client.HGET(
       `user:${friendEmail}:friendlist`,
       `${userEmail}`
     );
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     const friendInfo = await client.HGETALL(`user:${friendEmail}`);
 
-    const chat = await client.SMEMBERS(`chat:${isFriendExist}:messages`);
+    const chat = await client.LRANGE(`chat:${isFriendExist}:messages`, 0, -1);
 
     if (!chat) {
       return NextResponse.json(
@@ -51,7 +51,10 @@ export async function GET(req: NextRequest) {
       {
         success: true,
         data: chat,
-        friendInfo: friendInfo,
+        friendInfo: {
+          ...friendInfo,
+          chatId: isFriendExist,
+        },
       },
       { status: 200 }
     );
@@ -91,7 +94,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const message = await client.SADD(
+    const message = await client.RPUSH(
       `chat:${chatId}:messages`,
       JSON.stringify({
         timeStamp: Math.floor(Date.now() / 1000),

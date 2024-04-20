@@ -24,7 +24,7 @@ function Friends({ value }: { value: any }) {
         friends.map((friend) => {
           return (
             <Link
-              href={`/dashboard/chat/${friend.email}`}
+              href={`/dashboard/chat/${friend.email.split("@")[0]}`}
               className="flex items-center justify-between py-2 px-4 border rounded-md hover:bg-indigo-50 cursor-pointer"
               key={friend.email}
             >
