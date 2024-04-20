@@ -1,6 +1,6 @@
 import { createClient } from "redis";
 
-const client = createClient({
+export const client = createClient({
   socket: {
     host: "localhost",
     port: 6379,
@@ -123,15 +123,16 @@ const getUserFriends = async (key: string) => {
 };
 
 const addUserToFriend = async (userEmail: string, friendEmail: string) => {
+  const chatId = Math.floor(Math.random() * Date.now()).toString();
   const user = await client.HSET(
     `user:${userEmail}:friendlist`,
     friendEmail,
-    ""
+    chatId
   );
   const friend = await client.HSET(
     `user:${friendEmail}:friendlist`,
     userEmail,
-    ""
+    chatId
   );
   const isDeletedFromPendingRequest = await client.HDEL(
     `user:${userEmail}:pending:friend`,

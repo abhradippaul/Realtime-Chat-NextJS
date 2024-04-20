@@ -33,11 +33,11 @@ function page() {
       <h1 className="text-center my-4 text-2xl font-semibold">
         Pending Friend Requests
       </h1>
-      <div className="w-1/2 flex items-center justify-center my-4 max-w-[500px]">
+      <div className="w-[80%] flex items-center justify-center my-4 max-w-[500px]">
         {isLoading ? (
           <Loader2 className="size-8 animate-spin" />
         ) : (
-          <FriendRequestOptions value={pendingRequests} />
+          <FriendRequestOptions value={pendingRequests} setValue={setPendingRequests}/>
         )}
       </div>
     </main>

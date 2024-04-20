@@ -21,7 +21,7 @@ function UserInfo() {
           <h1 className="text-lg">{user.name}</h1>
         </div>
         <img
-          src="../logout.png"
+          src="../../logout.png"
           className="size-8 cursor-pointer"
           alt="logout"
           onClick={async () => {

@@ -1,13 +1,9 @@
 "use client";
 import { useUserContext } from "@/context/UserContextProvider";
+import Link from "next/link";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-function Friends({
-  value,
-}: {
-  value: any;
-}) {
-  const [isLoading, setIsLoading] = useState(true);
+function Friends({ value }: { value: any }) {
   const { user } = useUserContext();
   const [friends, setFriends] = useState([
     {
@@ -19,9 +15,7 @@ function Friends({
   useEffect(() => {
     if (value.length) {
       setFriends(value);
-      // console.log(value);
     }
-    // console.log(value);
   }, [user, value]);
   return (
     <div className="w-full">
@@ -29,8 +23,9 @@ function Friends({
         friends[0]?.email &&
         friends.map((friend) => {
           return (
-            <div
-              className="flex items-center justify-between py-2 px-4 border"
+            <Link
+              href={`/dashboard/chat/${friend.email}`}
+              className="flex items-center justify-between py-2 px-4 border rounded-md hover:bg-indigo-50 cursor-pointer"
               key={friend.email}
             >
               <img
@@ -39,7 +34,7 @@ function Friends({
                 alt=""
               />
               <h1 className="text-lg">{friend.name.split(" ")[0]}</h1>
-            </div>
+            </Link>
           );
         })}
     </div>

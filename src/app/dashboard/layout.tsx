@@ -2,9 +2,6 @@ import { ReactNode } from "react";
 import Dashboard from "../components/Dashboard";
 
 async function  Layout({ children }: { children: ReactNode }) {
-    // const response = await fetch("/api/dashboard")
-    // const data = await response.json()
-    // console.log(data);
     return (
       <div className="w-full flex items-center justify-between h-screen">
         <Dashboard />

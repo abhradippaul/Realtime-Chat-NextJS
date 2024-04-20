@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 
 interface User {
   name: string;
@@ -26,15 +26,18 @@ export const useUserContext = () => {
 };
 function UserContextProvider({ children }: { children: React.ReactNode }) {
   const { data } = useSession();
-  const user = {
-    name: data?.user?.name || "",
-    email: data?.user?.email || "",
-    image: data?.user?.image || "",
-  };
+
+  const user = useMemo(
+    () => ({
+      name: data?.user?.name || "",
+      email: data?.user?.email || "",
+      image: data?.user?.image || "",
+    }),
+    [data]
+  );
+
   return (
-    <User_Context_Provider value={{ user }}>
-      {children}
-      </User_Context_Provider>
+    <User_Context_Provider value={{ user }}>{children}</User_Context_Provider>
   );
 }
 
