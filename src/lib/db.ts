@@ -43,20 +43,7 @@ export async function setUserPendingRequest({
   email: string;
   userEmail: string;
 }) {
-  const isPending = await client.HEXISTS(
-    `user:${userEmail}:pending:friend`,
-    email
-  );
-  const isAccepted = await client.HEXISTS(
-    `user:${userEmail}:friendlist`,
-    email
-  );
-  if (isPending || isAccepted) {
-    return true;
-  } else {
-    await client.HSET(`user:${email}:pending:friend`, userEmail, "");
-    return false;
-  }
+  
 }
 
 export async function getUserPendingRequest(userEmail: string) {

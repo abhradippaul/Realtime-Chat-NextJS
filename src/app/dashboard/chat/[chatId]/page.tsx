@@ -99,7 +99,6 @@ function page() {
       } else {
         toast.error(data.message);
       }
-
       setUserInput("");
     } else {
       toast.error("Empty message");
@@ -136,8 +135,10 @@ function page() {
             >
               <div className="w-[45%]"></div>
               <div
-                className={`w-[45%] px-4 py-2 rounded-md text-white ${
-                  userEmail === msg.receiver ? "bg-indigo-700" : "bg-indigo-800"
+                className={`w-[45%] max-w-max px-4 py-2 rounded-md ${
+                  userEmail === msg.receiver
+                    ? "bg-gray-100 text-black rounded-bl-none"
+                    : "bg-indigo-700 text-white rounded-br-none"
                 }`}
               >
                 {msg.message}
@@ -150,7 +151,6 @@ function page() {
         <ReactTextareaAutosize
           className="border w-[80%] px-2 py-1 rounded-md text-lg sm:text-xl resize-none"
           onKeyDown={(e) => {
-            console.log(e);
             if (e.key === "Enter" && !e.shiftKey) {
               sendMessage();
             }

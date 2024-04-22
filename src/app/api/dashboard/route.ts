@@ -1,4 +1,4 @@
-import { getUserDashboard, getUserPendingRequestLength } from "@/lib/db";
+import { client, getUserDashboard, getUserPendingRequestLength } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
 //       message: "Chat empty",
 //     });
 //   }
+  // await client.SUBSCRIBE("chats",false,false)
   return NextResponse.json({
     success: true,
     ...res,

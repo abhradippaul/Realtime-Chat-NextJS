@@ -1,8 +1,8 @@
 "use client";
 
 import { useUserContext } from "@/context/UserContextProvider";
-import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { pusherClient } from "@/lib/pusher";
+import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 
 function FriendRequestOptions({
@@ -13,8 +13,6 @@ function FriendRequestOptions({
   setValue: Dispatch<SetStateAction<any>>;
 }) {
   const { user } = useUserContext();
-
-  const router = useRouter();
 
   const acceptFriend = useCallback(
     async (friendEmail: string) => {
@@ -32,10 +30,7 @@ function FriendRequestOptions({
             newArrPending.push(value[i]);
           }
         }
-        setValue((prev: any) => ({
-          ...prev,
-          pendingFriend: newArrPending,
-        }));
+        setValue(newArrPending);
         toast.success(data.message);
       }
     },
@@ -58,10 +53,7 @@ function FriendRequestOptions({
             newArrPending.push(value[i]);
           }
         }
-        setValue((prev: any) => ({
-          ...prev,
-          pendingFriend: newArrPending,
-        }));
+        setValue(newArrPending);
         toast.success(data.message);
       }
     },

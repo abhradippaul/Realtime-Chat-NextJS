@@ -5,14 +5,26 @@ import Friends from "./Friends";
 import UserInfo from "./UserInfo";
 import { useUserContext } from "@/context/UserContextProvider";
 import { Loader2 } from "lucide-react";
+import { pusherClient } from "@/lib/pusher";
+
+interface friendlistValue {
+  name: string;
+  image: string;
+  email: string;
+}
+interface dashboardDataValue {
+  pendingFriendLength: number;
+  friendlist: friendlistValue[];
+}
 
 function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useUserContext();
-  const [dashboardData, setDashboardData] = useState({
+  const [dashboardData, setDashboardData] = useState<dashboardDataValue>({
     pendingFriendLength: 0,
     friendlist: [],
   });
+
   useEffect(() => {
     if (user.email) {
       (async () => {
@@ -28,6 +40,26 @@ function Dashboard() {
       })();
     }
   }, [user]);
+
+  useEffect(() => {
+    (async () => {
+      if (user.email) {
+        pusherClient.subscribe(`user__${user.email}__dashboard_data`);
+        pusherClient.bind(`dashboard_data`, (data: any) => {
+          console.log(data.friendlist);
+          // setDashboardData((prev: any) => ({
+          //   friendlist: [...prev.friendlist, data.friendlist],
+          //   pendingFriendLength: data.pendingFriendLength,
+          // }));
+        });
+        return () => {
+          pusherClient.unsubscribe(`user__${user.email}__dashboard_data`);
+          pusherClient.unbind(`dashboard_data`);
+        };
+      }
+    })();
+  }, [user]);
+
   return (
     <div className="flex flex-col justify-between h-full w-full max-w-xs border-r overflow-y-auto p-4">
       <Link href="/">Logo</Link>
@@ -78,7 +110,11 @@ function Dashboard() {
           Your chats
         </h1>
         <div className="flex flex-col items-center">
-          {isLoading ? <Loader2 className="animate-spin size-8"/> : <Friends value={dashboardData.friendlist} />}
+          {isLoading ? (
+            <Loader2 className="animate-spin size-8" />
+          ) : (
+            <Friends value={dashboardData.friendlist} />
+          )}
         </div>
       </nav>
       <UserInfo />
