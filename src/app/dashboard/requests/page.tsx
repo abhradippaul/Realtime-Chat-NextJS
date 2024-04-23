@@ -51,11 +51,11 @@ function page() {
           setPendingRequests((prev) => [...prev, data]);
         });
       }
-      return () => {
-        pusherClient.unsubscribe(`user__${user.email}__pending_friend`);
-        pusherClient.unbind(`pending_friend`);
-      };
     }
+    return () => {
+      pusherClient.unsubscribe(`user__${user.email}__pending_friend`);
+      pusherClient.unbind(`pending_friend`);
+    };
   }, [user, pendingRequests]);
   return (
     <main className="w-full flex flex-col items-center justify-center">

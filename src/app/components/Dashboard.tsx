@@ -12,18 +12,13 @@ interface friendlistValue {
   image: string;
   email: string;
 }
-interface dashboardDataValue {
-  pendingFriendLength: number;
-  friendlist: friendlistValue[];
-}
 
 function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useUserContext();
-  const [dashboardData, setDashboardData] = useState<dashboardDataValue>({
-    pendingFriendLength: 0,
-    friendlist: [],
-  });
+  const [pendingFriendLength, setPendingFriendLength] = useState<number>(0);
+  const [friendlist, setFriendlist] = useState<friendlistValue[]>([]);
+  const [reload, setReload] = useState<boolean>(false);
 
   useEffect(() => {
     if (user.email) {
@@ -31,33 +26,27 @@ function Dashboard() {
         const reponse = await fetch(`/api/dashboard?userEmail=${user.email}`);
         const data = await reponse.json();
         if (data.success) {
-          setDashboardData({
-            pendingFriendLength: data.pendingFriendLength,
-            friendlist: data.friendlist,
-          });
+          setFriendlist(data.friendlist);
+          setPendingFriendLength(data.pendingFriendLength);
           setIsLoading(false);
         }
       })();
     }
-  }, [user]);
+  }, [user, reload]);
 
   useEffect(() => {
     (async () => {
       if (user.email) {
         pusherClient.subscribe(`user__${user.email}__dashboard_data`);
-        pusherClient.bind(`dashboard_data`, (data: any) => {
-          console.log(data.friendlist);
-          // setDashboardData((prev: any) => ({
-          //   friendlist: [...prev.friendlist, data.friendlist],
-          //   pendingFriendLength: data.pendingFriendLength,
-          // }));
+        pusherClient.bind(`dashboard_data`, () => {
+          setReload((prev) => !prev);
         });
-        return () => {
-          pusherClient.unsubscribe(`user__${user.email}__dashboard_data`);
-          pusherClient.unbind(`dashboard_data`);
-        };
       }
     })();
+    return () => {
+      pusherClient.unsubscribe(`user__${user.email}__dashboard_data`);
+      pusherClient.unbind(`dashboard_data`);
+    };
   }, [user]);
 
   return (
@@ -75,9 +64,9 @@ function Dashboard() {
             <h1 className="text-center text-lg  sm:text-xl">Pending</h1>{" "}
             {isLoading ? (
               <Loader2 className="animate-spin size-8" />
-            ) : dashboardData.pendingFriendLength ? (
+            ) : pendingFriendLength ? (
               <div className="bg-indigo-600 text-white rounded-full size-8 flex items-center justify-center sm:text-lg">
-                {dashboardData.pendingFriendLength}
+                {pendingFriendLength}
               </div>
             ) : (
               <div></div>
@@ -113,7 +102,7 @@ function Dashboard() {
           {isLoading ? (
             <Loader2 className="animate-spin size-8" />
           ) : (
-            <Friends value={dashboardData.friendlist} />
+            <Friends value={friendlist} />
           )}
         </div>
       </nav>

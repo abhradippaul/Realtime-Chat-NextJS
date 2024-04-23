@@ -50,17 +50,16 @@ export async function POST(req: NextRequest) {
         success: false,
       });
     }
-    // const pendingFriend = await client.HLEN(`user:${email}:pending:friend`);
+    const pendingFriend = await client.HLEN(`user:${email}:pending:friend`);
     const userInfo = await client.HGETALL(`user:${userEmail}`);
     pusherServer.trigger(`user__${email}__pending_friend`, "pending_friend", {
       ...userInfo,
       email: userEmail,
     });
-    // console.log(pendingFriend);
-    // pusherServer.trigger(`user__${email}__dashboard_data`, "dashboard_data", {
-    //   friendlist: {},
-    //   pendingFriendLength: pendingFriend,
-    // });
+
+    pusherServer.trigger(`user__${email}__dashboard_data`, "dashboard_data", {
+      pendingFriendLength: pendingFriend,
+    });
     return NextResponse.json({
       message: "Friend request send successfully",
       success: true,

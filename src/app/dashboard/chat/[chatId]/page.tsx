@@ -1,5 +1,6 @@
 "use client";
 import { useUserContext } from "@/context/UserContextProvider";
+import { pusherClient } from "@/lib/pusher";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -8,7 +9,7 @@ import ReactTextareaAutosize from "react-textarea-autosize";
 
 interface MsgValue {
   message: string;
-  timestamp?: string;
+  timeStamp?: string;
   sender?: string;
   receiver?: string;
 }
@@ -21,7 +22,7 @@ function page() {
   const [message, setMessage] = useState<MsgValue[]>([
     {
       message: "",
-      timestamp: "",
+      timeStamp: "",
       sender: "",
       receiver: "",
     },
@@ -43,17 +44,49 @@ function page() {
           }`
         );
         const chat = await response.json();
+        // console.log(chat);
         if (chat.success) {
           setUserInfo({
             ...chat.friendInfo,
             email: friendEmail + "@gmail.com",
           });
           // setMessage([JSON.parse(chat.data)]);
-          const temp = [];
+          const temp: any = [];
           for (let i = 0; i < chat.data.length; i++) {
             // console.log(chat.data[i]);
             temp.push(JSON.parse(chat.data[i]));
           }
+          // pusherClient.subscribe(`chat__${chat.friendInfo.chatId}__messages`);
+          // pusherClient.bind(
+          //   `messages`,
+          //   ({
+          //     msg,
+          //     sender,
+          //     receiver,
+          //     timeStamp,
+          //   }: {
+          //     msg: string;
+          //     sender: string;
+          //     receiver: string;
+          //     timeStamp: string;
+          //   }) => {
+          //     setMessage((prev: any) => [
+          //       ...prev,
+          //       {
+          //         message: msg,
+          //         timeStamp: timeStamp,
+          //         sender: sender,
+          //         receiver: receiver,
+          //       },
+          //     ]);
+          //     console.log({
+          //       message: msg,
+          //       timeStamp: timeStamp,
+          //       sender: sender,
+          //       receiver: receiver,
+          //     });
+          //   }
+          // );
           setMessage(temp);
           setIsLoading(false);
         } else {
@@ -61,7 +94,39 @@ function page() {
         }
       })();
     }
-  }, [friendEmail, userEmail, lastMessage]);
+  }, [friendEmail, userEmail]);
+
+  useEffect(() => {
+    if (userInfo.chatId && userEmail) {
+      pusherClient.subscribe(`chat__${userInfo.chatId}__messages`);
+      pusherClient.bind(
+        `messages`,
+        ({
+          msg,
+          sender,
+          receiver,
+          timeStamp,
+        }: {
+          msg: string;
+          sender: string;
+          receiver: string;
+          timeStamp: string;
+        }) => {
+          if (userEmail === receiver) {
+            setMessage((prev: any) => [
+              ...prev,
+              {
+                message: msg,
+                timeStamp: timeStamp,
+                sender: sender,
+                receiver: receiver,
+              },
+            ]);
+          }
+        }
+      );
+    }
+  }, [userEmail, userInfo]);
 
   useEffect(() => {
     lastMessage?.current?.scrollIntoView([{ behavior: "smooth" }]);
@@ -81,20 +146,12 @@ function page() {
         }
       );
       const data = await response.json();
+      console.log(data);
       if (data.success) {
         if (message[0]?.message) {
-          setMessage((prev) => [
-            ...prev,
-            {
-              message: userInput,
-            },
-          ]);
+          setMessage((prev) => [...prev, data.message]);
         } else {
-          setMessage([
-            {
-              message: userInput,
-            },
-          ]);
+          setMessage([data.message]);
         }
       } else {
         toast.error(data.message);
@@ -128,7 +185,7 @@ function page() {
         {message[0]?.message &&
           message.map((msg, i) => (
             <div
-              key={msg.timestamp}
+              key={msg.timeStamp}
               className={`w-full my-2 flex items-center ${
                 userEmail === msg.receiver && "flex-row-reverse"
               } justify-between`}

@@ -1,4 +1,5 @@
 import { client } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -112,10 +113,20 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
+    pusherServer.trigger(`chat__${chatId}__messages`, "messages", {
+      msg: msg,
+      sender: sender,
+      receiver: receiver,
+      timeStamp: Math.floor(Date.now() / 1000),
+    });
     return NextResponse.json(
       {
-        message: "Message send",
+        message: {
+          message: msg,
+          sender: sender,
+          receiver: receiver,
+          timeStamp: Math.floor(Date.now() / 1000),
+        },
         success: true,
       },
       { status: 200 }

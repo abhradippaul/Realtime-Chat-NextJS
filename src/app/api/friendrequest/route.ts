@@ -19,16 +19,18 @@ export async function POST(req: NextRequest) {
     );
   }
   await addUserToFriend(userEmail, friendEmail);
-  const pendingFriends = await client.HLEN(`user:${userEmail}:pending:friend`);
-  const friendList = await client.HGETALL(`user:${friendEmail}`);
-  console.log(pendingFriends, friendList);
-  pusherServer.trigger(`user__${userEmail}__dashboard_data`, "dashboard_data", {
-    friendlist: {
-      ...friendList,
-      email: friendEmail,
-    },
-    pendingFriendLength: pendingFriends,
-  });
+
+  pusherServer.trigger(
+    `user__${userEmail}__dashboard_data`,
+    "dashboard_data",
+    {}
+  );
+  pusherServer.trigger(
+    `user__${friendEmail}__dashboard_data`,
+    "dashboard_data",
+    {}
+  );
+
   return NextResponse.json({
     message: "You have accepted the friend request with " + friendEmail,
     success: true,
