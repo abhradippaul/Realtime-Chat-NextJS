@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const friendInfo = await client.HGETALL(`user:${friendEmail}`);
 
-    const chat = await client.LRANGE(`chat:${isFriendExist}:messages`, 0, -1);
+    const chat = await client.zRange(`chat:${isFriendExist}:messages`, 0, -1);
 
     if (!chat) {
       return NextResponse.json(
@@ -47,6 +47,13 @@ export async function GET(req: NextRequest) {
         { status: 200 }
       );
     }
+
+    pusherServer.trigger(
+      `user__${userEmail}__dashboard_data`,
+      "dashboard_data",
+      {}
+    );
+    await client.HSET(`user:${userEmail}:pending:chats`, friendEmail, 0);
 
     return NextResponse.json(
       {
@@ -94,16 +101,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    const message = await client.RPUSH(
-      `chat:${chatId}:messages`,
-      JSON.stringify({
-        timeStamp: Math.floor(Date.now() / 1000),
+    const timeStamp = Math.floor(Date.now() / 1000);
+    const message = await client.ZADD(`chat:${chatId}:messages`, {
+      value: JSON.stringify({
+        message: msg,
         sender: sender,
         receiver: receiver,
-        message: msg,
-      })
-    );
+        timeStamp: timeStamp,
+      }),
+      score: timeStamp,
+    });
 
     if (!message) {
       return NextResponse.json(
@@ -117,15 +124,36 @@ export async function POST(req: NextRequest) {
       msg: msg,
       sender: sender,
       receiver: receiver,
-      timeStamp: Math.floor(Date.now() / 1000),
+      timeStamp: timeStamp,
     });
+
+    const unReadMsg = await client.HGET(
+      `user:${receiver}:pending:chats`,
+      sender
+    );
+    if (unReadMsg) {
+      await client.HSET(
+        `user:${receiver}:pending:chats`,
+        sender,
+        parseInt(unReadMsg) + 1
+      );
+    } else {
+      await client.HSET(`user:${receiver}:pending:chats`, sender, 0);
+    }
+
+    pusherServer.trigger(
+      `user__${receiver}__dashboard_data`,
+      "dashboard_data",
+      {}
+    );
+
     return NextResponse.json(
       {
         message: {
           message: msg,
           sender: sender,
           receiver: receiver,
-          timeStamp: Math.floor(Date.now() / 1000),
+          timeStamp: timeStamp,
         },
         success: true,
       },

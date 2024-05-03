@@ -6,6 +6,7 @@ import UserInfo from "./UserInfo";
 import { useUserContext } from "@/context/UserContextProvider";
 import { Loader2 } from "lucide-react";
 import { pusherClient } from "@/lib/pusher";
+import { useParams } from "next/navigation";
 
 interface friendlistValue {
   name: string;
@@ -19,6 +20,7 @@ function Dashboard() {
   const [pendingFriendLength, setPendingFriendLength] = useState<number>(0);
   const [friendlist, setFriendlist] = useState<friendlistValue[]>([]);
   const [reload, setReload] = useState<boolean>(false);
+  const [pendingMsg, setPendingMsg] = useState([]);
 
   useEffect(() => {
     if (user.email) {
@@ -29,6 +31,7 @@ function Dashboard() {
           setFriendlist(data.friendlist);
           setPendingFriendLength(data.pendingFriendLength);
           setIsLoading(false);
+          setPendingMsg(data.pendingChat);
         }
       })();
     }
@@ -40,6 +43,7 @@ function Dashboard() {
         pusherClient.subscribe(`user__${user.email}__dashboard_data`);
         pusherClient.bind(`dashboard_data`, () => {
           setReload((prev) => !prev);
+          console.log("reload");
         });
       }
     })();
@@ -102,7 +106,7 @@ function Dashboard() {
           {isLoading ? (
             <Loader2 className="animate-spin size-8" />
           ) : (
-            <Friends value={friendlist} />
+            <Friends value={friendlist} pendingMsg={pendingMsg} />
           )}
         </div>
       </nav>

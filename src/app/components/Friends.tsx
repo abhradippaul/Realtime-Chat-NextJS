@@ -1,10 +1,12 @@
 "use client";
 import { useUserContext } from "@/context/UserContextProvider";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-function Friends({ value }: { value: any }) {
+function Friends({ value, pendingMsg }: { value: any; pendingMsg: any }) {
   const { user } = useUserContext();
+  const { chatId } = useParams();
   const [friends, setFriends] = useState([
     {
       name: "",
@@ -25,7 +27,7 @@ function Friends({ value }: { value: any }) {
           return (
             <Link
               href={`/dashboard/chat/${friend.email.split("@")[0]}`}
-              className="flex items-center justify-between py-2 px-4 border rounded-md hover:bg-indigo-50 cursor-pointer"
+              className="flex items-center justify-between py-2 px-4 my-2 border rounded-md hover:bg-indigo-50 cursor-pointer"
               key={friend.email}
             >
               <img
@@ -34,6 +36,13 @@ function Friends({ value }: { value: any }) {
                 alt=""
               />
               <h1 className="text-lg">{friend.name.split(" ")[0]}</h1>
+              {parseInt(pendingMsg[friend.email]) !== 0 &&
+                pendingMsg[friend.email] !== undefined &&
+                chatId !== friend.email.split("@")[0] && (
+                  <div className="bg-indigo-500 size-6 rounded-full flex items-center justify-center text-white">
+                    {pendingMsg[friend.email]}
+                  </div>
+                )}
             </Link>
           );
         })}

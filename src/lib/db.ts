@@ -42,9 +42,7 @@ export async function setUserPendingRequest({
 }: {
   email: string;
   userEmail: string;
-}) {
-  
-}
+}) {}
 
 export async function getUserPendingRequest(userEmail: string) {
   let pendingFriendRequest = await client.HGETALL(
@@ -77,13 +75,27 @@ export async function getUserDashboard({ userEmail }: { userEmail: string }) {
   let friendArr = [];
   for (let i = 0; i < friendlistKey.length; i++) {
     const data = await client.HGETALL(`user:${friendlistKey[i]}`);
-
+    const chatId = friendlist[friendlistKey[i]];
+    const lastMessage = await client.zRange(`chat:${chatId}:messages`, -1, -1);
+    let parsedMsg;
+    if (lastMessage.length) {
+      parsedMsg = {
+        timeStamp: JSON.parse(lastMessage[0]).timeStamp,
+      };
+    } else {
+      parsedMsg = {
+        timeStamp: 0,
+      };
+    }
     friendArr.push({
       ...data,
+      ...parsedMsg,
       email: friendlistKey[i],
     });
   }
-
+  friendArr.sort((a, b) => {
+    return b.timeStamp - a.timeStamp;
+  });
   return {
     pendingFriendLength,
     friendlist: friendArr,
