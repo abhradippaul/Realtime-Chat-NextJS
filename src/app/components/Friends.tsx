@@ -2,7 +2,7 @@
 import { useUserContext } from "@/context/UserContextProvider";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function Friends({ value, pendingMsg }: { value: any; pendingMsg: any }) {
   const { user } = useUserContext();

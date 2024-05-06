@@ -55,7 +55,10 @@ function Dashboard() {
 
   return (
     <div className="flex flex-col justify-between h-full w-full max-w-xs border-r overflow-y-auto p-4">
-      <Link href="/">Logo</Link>
+      <div className="w-full flex items-center justify-between">
+        <Link href="/">Logo</Link>
+        <Link href="/dashboard">Dashboard</Link>
+      </div>
       <nav className="flex flex-col">
         <div>
           <h1 className="text-center my-4 text-2xl font-semibold">

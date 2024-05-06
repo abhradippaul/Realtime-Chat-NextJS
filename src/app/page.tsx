@@ -80,20 +80,20 @@ export default function Home() {
             ))}
         </div>
       </nav>
-      <h1>This is my website</h1>
-      {userInfo.name || !isLoading ? (
-        <div>
-          <h1>Your name is : {userInfo?.name}</h1>
-          <h1>Your email is : {userInfo?.email}</h1>
-          <img src={userInfo?.image || ""} alt="User image" />
-        </div>
+      <h1 className="text-center">This is my website</h1>
+      {!isLoading ? (
+        userInfo.name && (
+          <div className="w-full flex flex-col items-center justify-center">
+            <h1>Your name is : {userInfo?.name}</h1>
+            <h1>Your email is : {userInfo?.email}</h1>
+            <img src={userInfo?.image || ""} alt="User image" />
+          </div>
+        )
       ) : (
-        <Loader2 className="animate-spin" />
+        <div className="w-full flex items-center justify-center">
+          <Loader2 className="animate-spin" />
+        </div>
       )}
-      <Button variant="default" size="default" isLoading={isLoading}>
-        Button
-      </Button>
-      <Button isLoading={isLoading}>Button</Button>
     </div>
   );
 }
